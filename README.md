@@ -76,7 +76,7 @@ AI does the heavy lifting. You set the standard. Use AI to do what you'd otherwi
 
 | Document | Status |
 | --- | --- |
-| [Working with AI Agents](ai-workflow.md) | 📝 TODO |
+| [Working with AI Agents](ai-workflow.md) | ✅ First draft |
 
 ---
 
