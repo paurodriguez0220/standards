@@ -69,23 +69,20 @@ Never return `200` with an error in the body. The status code is the contract.
 
 ### Error shape
 
-Every error response uses the same structure:
+All error responses use RFC 7807 **ProblemDetails**. This is the standard — no custom error shapes.
 
 ```json
 {
-  "error": {
-    "code": "VALIDATION_FAILED",
-    "message": "Email is required.",
-    "details": [
-      { "field": "email", "message": "Email is required." }
-    ]
+  "type": "https://tools.ietf.org/html/rfc7807",
+  "title": "Validation Failed",
+  "status": 400,
+  "errors": {
+    "email": ["Email is required."]
   }
 }
 ```
 
-- `code` — machine-readable, SCREAMING_SNAKE_CASE. Consumers switch on this, not the message.
-- `message` — human-readable summary.
-- `details` — optional array for field-level validation errors.
+ASP.NET Core produces this automatically via `Results.ValidationProblem()` and `IProblemDetailsService`. See [OpenAPI, Errors & Logging](openapi.md) for the full error handling implementation.
 
 Never expose stack traces, internal exception messages, or database errors in the response body.
 

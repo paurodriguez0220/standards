@@ -71,11 +71,11 @@ Every HTTP response from a web-facing app should include:
 
 - Never expose stack traces, exception messages, or internal identifiers in API responses.
 - Return a generic error message to the client. Log the full detail server-side.
-- Use consistent error shapes — see [API Design](api-design.md).
+- All error responses use RFC 7807 ProblemDetails — see [OpenAPI, Errors & Logging](openapi.md).
 
 ```json
-// Good — generic, no internals
-{ "error": { "code": "INTERNAL_ERROR", "message": "Something went wrong." } }
+// Good — ProblemDetails, no internals
+{ "type": "...", "title": "An unexpected error occurred.", "status": 500 }
 
 // Bad — exposes internals
 { "error": "NullReferenceException at OrderService.cs:47" }
