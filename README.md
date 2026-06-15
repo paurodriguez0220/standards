@@ -51,6 +51,7 @@ AI does the heavy lifting. You set the standard. Use AI to do what you'd otherwi
 | [Documentation](documentation.md) | ✅ First draft |
 | [Design Patterns](design-patterns.md) | ✅ First draft |
 | [API Design](api-design.md) | ✅ First draft |
+| [OpenAPI, Errors & Logging](openapi.md) | ✅ First draft |
 | [Testing](testing.md) | ✅ First draft |
 | [Playwright (E2E)](playwright.md) | ✅ First draft |
 

@@ -186,6 +186,7 @@ Retry-After: 30
 
 ## Related
 
+- [OpenAPI, Errors & Logging](openapi.md)
 - [Code Style & Conventions](code-style.md)
 - [Testing](testing.md)
 - [Security Practices](security.md)
