@@ -52,6 +52,7 @@ AI does the heavy lifting. You set the standard. Use AI to do what you'd otherwi
 | [Design Patterns](design-patterns.md) | ✅ First draft |
 | [API Design](api-design.md) | ✅ First draft |
 | [Testing](testing.md) | ✅ First draft |
+| [Playwright (E2E)](playwright.md) | ✅ First draft |
 
 ### Architecture
 
@@ -66,6 +67,7 @@ AI does the heavy lifting. You set the standard. Use AI to do what you'd otherwi
 | Document | Status |
 | --- | --- |
 | [Git Workflow](git-workflow.md) | ✅ First draft |
+| [GitHub Actions](github-actions.md) | ✅ First draft |
 
 ### Security
 

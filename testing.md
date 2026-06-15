@@ -20,7 +20,7 @@ Testing philosophy and standards that apply across projects regardless of langua
 | --- | --- | --- | --- |
 | Unit | A single function or class in isolation | Fast | Business logic, calculations, transformations |
 | Integration | Multiple components working together | Medium | DB queries, external service calls, API endpoints |
-| E2E | Full flows from the user's perspective | Slow | Critical user journeys only |
+| E2E | Full flows from the user's perspective | Slow | Critical user journeys against a live environment — see [Playwright](playwright.md) |
 
 Write more unit tests than integration tests. Write more integration tests than E2E tests.
 
