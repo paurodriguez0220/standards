@@ -54,6 +54,8 @@ AI does the heavy lifting. You set the standard. Use AI to do what you'd otherwi
 
 ### Architecture
 
+> Architecture standards are platform-scoped. They apply when a project uses that platform — skip them when it doesn't.
+
 | Document | Status |
 | --- | --- |
 | [Azure Infrastructure](azure-infra.md) | ✅ First draft |
