@@ -52,6 +52,12 @@ AI does the heavy lifting. You set the standard. Use AI to do what you'd otherwi
 | [API Design](api-design.md) | 📝 TODO |
 | [Testing](testing.md) | 📝 TODO |
 
+### Architecture
+
+| Document | Status |
+| --- | --- |
+| [Azure Infrastructure](azure-infra.md) | ✅ First draft |
+
 ### Delivery
 
 | Document | Status |
