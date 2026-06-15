@@ -25,6 +25,32 @@ If a secret is ever accidentally committed: rotate it immediately, then remove i
 - Validate on the server — client-side checks are UX, not security.
 - Use managed identities for service-to-service auth in Azure. No stored credentials, no connection strings with passwords.
 
+### OAuth2 Scope Naming
+
+Scopes describe what the token grants access to — they are not system roles.
+
+- Name scopes after the access level, not the service or a role: `service:manage` / `service:read`, not `service-admin` or `admin`.
+- Don't embed the service name as an entity in its own scope. `duende:manage` not `duende-admin` — a server does not need to describe itself as an admin resource.
+- Use a consistent verb pattern across all services: `:manage` for write access, `:read` for read-only.
+- Keep scopes coarse unless a real consumer needs finer granularity. Don't pre-optimise into per-entity scopes (`users:read`, `clients:read`) until a specific use case demands it — the added complexity rarely pays off.
+
+### Dev-Only Auth Shortcuts
+
+Dev-only auth setups (in-memory signing keys, developer certificates, ephemeral token stores) must never reach production.
+
+- Gate every dev-only auth configuration with an `IsDevelopment()` check.
+- Throw a descriptive `InvalidOperationException` in the `else` branch so the app fails at startup rather than running silently insecure.
+
+```csharp
+if (builder.Environment.IsDevelopment())
+    identityServer.AddDeveloperSigningCredential();
+else
+    throw new InvalidOperationException(
+        "A signing certificate must be configured for non-development environments.");
+```
+
+Never rely on a deployment pipeline to "just not deploy dev settings" — make the code itself refuse to start in production without explicit secure configuration.
+
 ---
 
 ## Input Validation

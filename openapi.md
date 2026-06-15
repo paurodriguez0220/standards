@@ -173,6 +173,26 @@ Validation failures return `400` with a `ProblemDetails` body listing every fiel
 
 ASP.NET Core does this automatically when `ModelState` is invalid. For FluentValidation, register it with `AddFluentValidationAutoValidation()`.
 
+### Constrained string parameters
+
+When a string parameter accepts a fixed set of values, use `[AllowedValues]` with named constants — never accept an open string and silently default to a fallback.
+
+```csharp
+// constants
+public static class GrantTypeNames
+{
+    public const string ClientCredentials = "client_credentials";
+    public const string AuthorizationCode  = "authorization_code";
+}
+
+// request model
+[AllowedValues(GrantTypeNames.ClientCredentials, GrantTypeNames.AuthorizationCode)]
+[Description("Grant type: 'client_credentials' or 'authorization_code'.")]
+public string? GrantType { get; set; }
+```
+
+A parameter that silently falls through to a default on invalid input hides bugs and misleads callers. `[AllowedValues]` produces a `400` validation error with a clear message instead.
+
 ### Rules
 
 - Never trust client input. Validate every request body, query parameter, and route value.
