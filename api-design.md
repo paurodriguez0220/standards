@@ -1,6 +1,6 @@
 ## Purpose
 
-REST API design standards.
+REST API design standards that apply across projects.
 
 ---
 
@@ -10,6 +10,16 @@ REST API design standards.
 - Plural for collections: `/users`, `/orders`
 - Nested resources for ownership: `/users/{id}/orders`
 - Lowercase, hyphen-separated: `/user-profiles` not `/userProfiles`
+- Keep nesting shallow — max two levels deep. Deeper than that, flatten it.
+
+```
+// Good
+GET /users/{id}/orders
+
+// Too deep — flatten it
+GET /users/{id}/orders/{orderId}/items/{itemId}
+→ GET /order-items/{itemId}
+```
 
 ---
 
@@ -23,43 +33,102 @@ REST API design standards.
 | `PATCH` | Partial update |
 | `DELETE` | Remove a resource |
 
+`GET` requests must be safe and idempotent. `PUT` and `DELETE` must be idempotent.
+
 ---
 
 ## Status Codes
 
 Use the right code — don't return `200` for everything.
 
-| Code | Meaning |
+| Code | When to use |
 | --- | --- |
 | `200 OK` | Success with body |
-| `201 Created` | Resource created (POST) |
-| `204 No Content` | Success, no body |
-| `400 Bad Request` | Client sent invalid data |
+| `201 Created` | Resource created — include `Location` header pointing to the new resource |
+| `204 No Content` | Success, no body (DELETE, some PATCHes) |
+| `400 Bad Request` | Client sent invalid data — missing fields, wrong types |
 | `401 Unauthorized` | Not authenticated |
 | `403 Forbidden` | Authenticated but not allowed |
 | `404 Not Found` | Resource doesn't exist |
-| `409 Conflict` | State conflict (duplicate, version mismatch) |
-| `422 Unprocessable` | Valid syntax, invalid semantics |
-| `500 Internal Server Error` | Something broke on the server |
+| `409 Conflict` | State conflict — duplicate, optimistic concurrency mismatch |
+| `422 Unprocessable Entity` | Valid syntax, invalid semantics — failed business rules |
+| `429 Too Many Requests` | Rate limit exceeded — include `Retry-After` header |
+| `500 Internal Server Error` | Unhandled server failure |
+
+Never return `200` with an error in the body. The status code is the contract.
 
 ---
 
 ## Request & Response
 
 - JSON everywhere. `Content-Type: application/json`.
-- Use camelCase for JSON field names.
-- Never expose internal database IDs as the only identifier — consider UUIDs for public APIs.
-- Always return a consistent error shape:
+- camelCase for JSON field names.
+- Never expose internal database IDs as the only identifier — use UUIDs for public-facing resources.
+- Dates in ISO 8601 UTC: `2025-06-15T10:30:00Z`.
+- Empty collections return `[]`, not `null` or `404`.
+
+### Error shape
+
+Every error response uses the same structure:
 
 ```json
 {
   "error": {
     "code": "VALIDATION_FAILED",
     "message": "Email is required.",
-    "details": []
+    "details": [
+      { "field": "email", "message": "Email is required." }
+    ]
   }
 }
 ```
+
+- `code` — machine-readable, SCREAMING_SNAKE_CASE. Consumers switch on this, not the message.
+- `message` — human-readable summary.
+- `details` — optional array for field-level validation errors.
+
+Never expose stack traces, internal exception messages, or database errors in the response body.
+
+---
+
+## Pagination
+
+Use cursor-based pagination for large or frequently updated collections. Use offset pagination only for small, stable datasets.
+
+### Cursor-based (preferred)
+
+```
+GET /orders?limit=20&cursor=eyJpZCI6MTAwfQ
+
+{
+  "data": [...],
+  "pagination": {
+    "nextCursor": "eyJpZCI6MTIwfQ",
+    "hasMore": true
+  }
+}
+```
+
+### Offset-based
+
+```
+GET /orders?page=2&pageSize=20
+
+{
+  "data": [...],
+  "pagination": {
+    "page": 2,
+    "pageSize": 20,
+    "totalCount": 150,
+    "totalPages": 8
+  }
+}
+```
+
+Rules:
+- Always cap `pageSize` / `limit` server-side. Don't let clients request unbounded results.
+- Default page size should be documented and consistent across endpoints.
+- Never return paginated data without a `pagination` envelope — callers need to know there's more.
 
 ---
 
@@ -67,12 +136,56 @@ Use the right code — don't return `200` for everything.
 
 Version in the URL path: `/api/v1/users`
 
-- Introduce a new version for breaking changes only.
-- Support the previous version for a migration window.
+- Introduce a new version only for breaking changes.
+- Additive changes (new fields, new endpoints) are not breaking — no new version needed.
+- Support the previous version for a defined migration window. Communicate the deprecation timeline.
 - Document what changed between versions.
+
+Breaking changes (require a new version):
+- Removing or renaming a field
+- Changing a field's type
+- Changing status code semantics
+- Removing an endpoint
 
 ---
 
-## TODO
+## Authentication & Authorisation
 
-> _Add pagination standards, auth patterns, and rate limiting details here._
+- Use bearer tokens: `Authorization: Bearer {token}`.
+- JWT for stateless APIs. Validate signature, expiry, and audience on every request.
+- Return `401` for missing or invalid token, `403` for valid token but insufficient permissions.
+- Never put sensitive data in the JWT payload — it's encoded, not encrypted.
+- Short token expiry + refresh token rotation for user-facing APIs.
+
+---
+
+## Rate Limiting
+
+All public-facing APIs must implement rate limiting.
+
+- Return `429 Too Many Requests` when the limit is exceeded.
+- Include response headers so clients can self-throttle:
+
+```
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 14
+X-RateLimit-Reset: 1718445600
+Retry-After: 30
+```
+
+---
+
+## General Rules
+
+- Design for the consumer — the API exists to serve callers, not to mirror the database schema.
+- Be consistent. Same patterns, same naming, same error shape across every endpoint in the project.
+- Never break a published contract without a versioning strategy.
+- Document every endpoint — at minimum: URL, method, request shape, response shape, error codes.
+
+---
+
+## Related
+
+- [Code Style & Conventions](code-style.md)
+- [Testing](testing.md)
+- [Security Practices](security.md)
