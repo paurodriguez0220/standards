@@ -63,6 +63,29 @@ entity.Property(e => e.Email)
       .IsRequired();
 ```
 
+### Identity Table Naming
+
+ASP.NET Core Identity defaults to `AspNetUsers`, `AspNetRoles`, etc. Strip the framework prefix when Identity tables have a dedicated database — the prefix exists to prevent collisions in shared databases and adds noise otherwise.
+
+```csharp
+protected override void OnModelCreating(ModelBuilder builder)
+{
+    base.OnModelCreating(builder);
+
+    builder.Entity<IdentityUser>().ToTable("Users");
+    builder.Entity<IdentityRole>().ToTable("Roles");
+    builder.Entity<IdentityUserRole<string>>().ToTable("UserRoles");
+    builder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims");
+    builder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins");
+    builder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
+    builder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims");
+}
+```
+
+Keep the prefix only when Identity tables share a database with other application tables.
+
+---
+
 ### Migrations
 
 - One migration per logical change. Don't batch unrelated schema changes into one migration.
