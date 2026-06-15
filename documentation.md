@@ -140,3 +140,7 @@ Update the date when the document changes. The signature is a signal that the do
 
 - [Working with AI Agents](ai-workflow.md)
 - [Git Workflow](git-workflow.md)
+
+---
+*Maintained by paurodriguez0220 · Last updated: 2026-06-15*
+*Standards: https://github.com/paurodriguez0220/standards*

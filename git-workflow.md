@@ -129,3 +129,7 @@ Use semantic versioning: `v{major}.{minor}.{patch}`
 - **Major** — breaking change
 
 Tag on `main` after merge. Automate release notes where possible.
+
+---
+*Maintained by paurodriguez0220 · Last updated: 2026-06-15*
+*Standards: https://github.com/paurodriguez0220/standards*

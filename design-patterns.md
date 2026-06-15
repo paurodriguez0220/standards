@@ -151,3 +151,7 @@ Layered architecture, hexagonal ports, CQRS — applied because the pattern is p
 - [Code Style & Conventions](code-style.md)
 - [API Design](api-design.md)
 - [Testing](testing.md)
+
+---
+*Maintained by paurodriguez0220 · Last updated: 2026-06-15*
+*Standards: https://github.com/paurodriguez0220/standards*

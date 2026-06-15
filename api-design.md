@@ -189,3 +189,7 @@ Retry-After: 30
 - [Code Style & Conventions](code-style.md)
 - [Testing](testing.md)
 - [Security Practices](security.md)
+
+---
+*Maintained by paurodriguez0220 · Last updated: 2026-06-15*
+*Standards: https://github.com/paurodriguez0220/standards*

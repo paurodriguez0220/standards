@@ -131,3 +131,7 @@ MCP (Model Context Protocol) servers extend what an agent can do — connecting 
 - [Git Workflow](git-workflow.md)
 - [Security Practices](security.md)
 - [Code Style & Conventions](code-style.md)
+
+---
+*Maintained by paurodriguez0220 · Last updated: 2026-06-15*
+*Standards: https://github.com/paurodriguez0220/standards*

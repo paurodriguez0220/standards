@@ -146,3 +146,7 @@ resource dbSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = if (!empty(db
 
 - [Git Workflow](git-workflow.md)
 - [Security Practices](security.md)
+
+---
+*Maintained by paurodriguez0220 · Last updated: 2026-06-15*
+*Standards: https://github.com/paurodriguez0220/standards*

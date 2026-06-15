@@ -125,3 +125,7 @@ Every HTTP response from a web-facing app should include:
 - [API Design](api-design.md)
 - [Azure Infrastructure](azure-infra.md)
 - [Git Workflow](git-workflow.md)
+
+---
+*Maintained by paurodriguez0220 · Last updated: 2026-06-15*
+*Standards: https://github.com/paurodriguez0220/standards*
