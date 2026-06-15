@@ -97,9 +97,114 @@ var pending = (await _db.Orders.ToListAsync())
 
 ---
 
-## Language-Specific
+## C# / .NET
 
-> _Add language-specific conventions here as needed (e.g. .NET, TypeScript, Python)._
+### Naming
+
+| Element | Convention | Example |
+| --- | --- | --- |
+| Class, method, property | PascalCase | `OrderService`, `GetById` |
+| Private field | `_camelCase` | `_orderRepository` |
+| Interface | `I` prefix + PascalCase | `IOrderRepository` |
+| Async method | `Async` suffix | `GetUserAsync` |
+| Constant | PascalCase | `MaxRetryCount` |
+
+### Async / Await
+
+- Never `.Result` or `.Wait()` — blocks the thread and causes deadlocks in ASP.NET.
+- Async all the way down — don't mix sync and async in a call chain.
+- Always accept and forward `CancellationToken` in async public methods.
+- `ConfigureAwait(false)` in library code. Not required in application code (controllers, services).
+
+```csharp
+// Good
+public async Task<Order> GetOrderAsync(int id, CancellationToken ct)
+    => await _db.Orders.FindAsync([id], ct);
+
+// Bad — deadlock risk
+public Order GetOrder(int id)
+    => _db.Orders.FindAsync(id).Result;
+```
+
+### Null Handling
+
+- Enable nullable reference types in every project: `<Nullable>enable</Nullable>`.
+- Use `?.`, `??`, and `??=` — avoid explicit null checks where the operators are cleaner.
+- Use pattern matching for null checks in branching logic: `if (user is null)`.
+
+### Dependency Injection
+
+- Constructor injection only — no service locator (`IServiceProvider` injected into business logic is a smell).
+- Register by interface, not concrete type.
+- Lifetime rules: `Scoped` for DbContext and per-request services, `Transient` for lightweight stateless services, `Singleton` only for truly stateless and thread-safe services.
+
+### Types
+
+- Use `record` for immutable DTOs, value objects, and command/query objects.
+- Use `class` for entities with identity and mutable state.
+- `var` when the type is obvious from the right-hand side. Explicit type when it isn't.
+
+### Exception Handling
+
+- Catch specific exceptions — not bare `catch (Exception)`.
+- Never swallow exceptions silently (`catch { }` is always wrong).
+- Custom exception types for domain errors: `OrderNotFoundException`, `InsufficientStockException`.
+- Let unhandled exceptions bubble to the global handler — don't catch-and-rethrow without adding context.
+
+---
+
+## TypeScript
+
+### Strict Mode
+
+Always enable strict mode in `tsconfig.json`. No exceptions.
+
+```json
+{ "compilerOptions": { "strict": true } }
+```
+
+### Naming
+
+| Element | Convention | Example |
+| --- | --- | --- |
+| Type, interface, class, enum | PascalCase | `OrderStatus`, `UserProfile` |
+| Variable, function, method | camelCase | `getOrderById` |
+| Interface | No `I` prefix (unlike C#) | `OrderRepository` not `IOrderRepository` |
+| Enum values | PascalCase | `OrderStatus.Pending` |
+| File | kebab-case | `order-service.ts` |
+
+### Types
+
+- No `any`. If the type is unknown, use `unknown` and narrow it before use.
+- No non-null assertion (`!`) unless you can prove at the call site it cannot be null.
+- Use `interface` for object shapes. Use `type` for unions, intersections, and aliases.
+- Explicit return types on exported and public functions.
+
+```ts
+// Good
+interface Order { id: string; status: OrderStatus; }
+type OrderStatus = 'pending' | 'fulfilled' | 'cancelled';
+
+function getOrder(id: string): Promise<Order> { ... }
+
+// Bad
+const getOrder = async (id: any) => { ... }
+```
+
+### Async / Await
+
+- Always `async/await` over raw `.then()/.catch()` chains.
+- Never let a Promise float unhandled — always `await` or explicitly handle the rejection.
+
+### Imports & Exports
+
+- Named exports over default exports — easier to refactor and grep.
+- No barrel files (`index.ts` that re-exports everything) — they create circular dependency risks and slow down build tools.
+
+### Null / Undefined
+
+- Prefer `undefined` over `null` for optional values — it's what TypeScript's optional fields produce.
+- Use optional chaining `?.` and nullish coalescing `??` consistently.
 
 ---
 
