@@ -8,6 +8,7 @@ Coding conventions that apply across projects regardless of language.
 
 - Names should reveal intent. If a name needs a comment to explain it, rename it.
 - Avoid abbreviations unless they're universally understood (`id`, `url`, `api`)
+- When a property originates from an external system or API, prefix it with the source name to reveal intent. `PseCompanyId` is unambiguous; `CmpyId` is not. This also prevents collisions when multiple external systems are integrated.
 - Boolean names should read as questions: `isActive`, `hasPermission`, `canEdit`
 - Functions should be verbs: `getUser`, `calculateTotal`, `sendEmail`
 - Classes and types should be nouns: `UserService`, `OrderRepository`
@@ -49,7 +50,7 @@ Always use code-first migrations. The codebase is the source of truth for the sc
 
 - One class per file, named after the entity: `Order.cs`, `UserProfile.cs`
 - Use data annotations or Fluent API — pick one per project and stay consistent. Prefer Fluent API for complex mappings; keep models clean.
-- Explicit column types over convention defaults where precision matters (`decimal(18,2)`, `nvarchar(256)`).
+- Explicit column types on **every** `decimal` property — not just "where precision matters". Convention defaults vary by provider and can silently produce `TEXT` or lose precision on migration. Configure all of them.
 - Always configure string lengths — don't rely on `nvarchar(max)` by default.
 
 ```csharp
@@ -83,6 +84,26 @@ protected override void OnModelCreating(ModelBuilder builder)
 ```
 
 Keep the prefix only when Identity tables share a database with other application tables.
+
+---
+
+### NuGet Feed Isolation
+
+On machines enrolled in a corporate environment, global NuGet config often includes private ADO or Artifactory feeds. These break `dotnet restore` for personal projects that don't have credentials for those feeds.
+
+Add a `NuGet.config` at the solution root for every personal or non-corporate project:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <packageSources>
+    <clear />
+    <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+  </packageSources>
+</configuration>
+```
+
+`<clear />` removes all inherited sources. Without it, restores silently attempt private feeds and fail with 401 errors that look like network problems.
 
 ---
 
@@ -237,5 +258,5 @@ const getOrder = async (id: any) => { ... }
 - [Testing](testing.md)
 
 ---
-*Maintained by paurodriguez0220 · Last updated: 2026-06-15*
+*Maintained by paurodriguez0220 · Last updated: 2026-06-17*
 *Standards: https://github.com/paurodriguez0220/standards*

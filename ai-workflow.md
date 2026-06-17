@@ -124,6 +124,97 @@ MCP (Model Context Protocol) servers extend what an agent can do — connecting 
 - Review what tools an MCP server exposes before enabling it. Each tool is a capability you're granting.
 - Treat MCP tool calls the same as code changes — they can have side effects.
 
+### Building .NET MCP Servers
+
+The standard stack for a .NET MCP stdio server:
+
+```xml
+<PackageReference Include="ModelContextProtocol" Version="1.4.0" />
+<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.x" />
+```
+
+**Program.cs pattern:**
+
+```csharp
+var builder = Host.CreateApplicationBuilder(args);
+
+// All logs must go to stderr — stdout is reserved for JSON-RPC messages.
+// Writing logs to stdout corrupts the MCP pipe and breaks tool calls silently.
+builder.Logging.AddConsole(options =>
+{
+    options.LogToStandardErrorThreshold = LogLevel.Trace;
+});
+
+builder.Services.AddMcpServer()
+    .WithStdioServerTransport()
+    .WithTools<MyToolClass>();
+
+await builder.Build().RunAsync();
+```
+
+**Tool registration:**
+
+```csharp
+[McpServerToolType]
+public sealed class MyToolClass
+{
+    [McpServerTool, Description("What this tool does — shown to the model.")]
+    public async Task<string> DoThing(
+        [Description("Parameter description.")] string input,
+        CancellationToken ct = default)
+    {
+        // return JSON string
+    }
+}
+```
+
+**SQLite DB path** — resolve relative to the executable, not the working directory:
+
+```csharp
+var dbPath = Path.Combine(AppContext.BaseDirectory, "myapp.db");
+builder.Services.AddDbContext<MyDbContext>(o => o.UseSqlite($"Data Source={dbPath}"));
+```
+
+**Always add `NuGet.config`** with `<clear />` when building on a corporate machine — see [Code Style](code-style.md#nuget-feed-isolation).
+
+### Registering with Claude Desktop
+
+Claude Desktop (Microsoft Store install) config location:
+
+```
+%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\claude_desktop_config.json
+```
+
+Claude Desktop does not inherit the terminal PATH. **Always publish as a self-contained single-file exe** — pointing at a DLL with `dotnet <path>.dll` will fail silently with "unknown skill" errors:
+
+```bash
+dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
+```
+
+Config entry:
+
+```json
+{
+  "mcpServers": {
+    "my-server": {
+      "command": "C:\\full\\path\\to\\publish\\MyServer.exe"
+    }
+  }
+}
+```
+
+After editing the config, fully quit Claude Desktop (system tray → Quit) and reopen — it does not hot-reload.
+
+### Registering with Claude Code
+
+```bash
+claude mcp add <server-name> <command> [args...]
+# example:
+claude mcp add stocks-mcp dotnet "C:\path\to\Stocks.Mcp.dll"
+```
+
+Claude Code inherits the terminal PATH so `dotnet <dll>` works here. Restart the session after adding.
+
 ---
 
 ## Related
@@ -133,5 +224,5 @@ MCP (Model Context Protocol) servers extend what an agent can do — connecting 
 - [Code Style & Conventions](code-style.md)
 
 ---
-*Maintained by paurodriguez0220 · Last updated: 2026-06-15*
+*Maintained by paurodriguez0220 · Last updated: 2026-06-17*
 *Standards: https://github.com/paurodriguez0220/standards*
