@@ -13,6 +13,26 @@ Coding conventions that apply across projects regardless of language.
 - Functions should be verbs: `getUser`, `calculateTotal`, `sendEmail`
 - Classes and types should be nouns: `UserService`, `OrderRepository`
 
+### Repository Naming
+
+Repository and root directory names follow `{purpose}-{apptype}` where `{apptype}` is one of:
+
+| Suffix | App type |
+| --- | --- |
+| `-api` | ASP.NET Core REST API |
+| `-web` | ASP.NET Core web app with UI (Razor Pages, MVC, Blazor) |
+| `-auth` | ASP.NET Core Identity / auth server (Duende, Keycloak-based) |
+| `-functions` | Azure Functions app |
+| `-worker` | Long-running background service (Generic Host, no HTTP) |
+| `-console` | CLI or one-shot console tool |
+| `-mcp` | Model Context Protocol server |
+| `-lib` | Reusable class library |
+| `-docs` | Documentation, standards, or reference repository |
+
+If `{purpose}` is multiple words, separate them with underscores: `resume_matcher-console`, `price_sync-worker`.
+
+Examples: `billing-api`, `admin-web`, `soa-functions`, `jarvis-mcp`, `price_sync-worker`, `resume_matcher-console`, `standards-docs`.
+
 ---
 
 ## Functions & Methods
@@ -258,5 +278,5 @@ const getOrder = async (id: any) => { ... }
 - [Testing](testing.md)
 
 ---
-*Maintained by paurodriguez0220 · Last updated: 2026-06-17*
-*Standards: https://github.com/paurodriguez0220/standards*
+*Maintained by paurodriguez0220 · Last updated: 2026-06-18*
+*Standards: https://github.com/paurodriguez0220/standards-docs*
