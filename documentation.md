@@ -28,6 +28,17 @@ Prerequisites, how to clone, how to run locally.
 ## Architecture
 Key moving parts — main layers, external dependencies, notable patterns.
 Keep it to a paragraph or a simple diagram. Not a novel.
+Explicitly name the design patterns used (Options pattern, Strategy, Factory, Orchestrator, etc.).
+
+## Dependencies
+All external services, NuGet packages, and integrations the app needs at runtime.
+| Dependency | Purpose |
+| --- | --- |
+| Gmail API | Fetches emails |
+| SQLite | Persistent storage |
+| iText7 | PDF manipulation |
+
+List only runtime dependencies — not build tools or test libraries.
 
 ## Configuration
 Environment variables and secrets required to run — names, not values.
@@ -36,13 +47,15 @@ Environment variables and secrets required to run — names, not values.
 - Production URL
 - Staging/test URL
 - Related repos
-- Standards: https://github.com/paurodriguez0220/standards
+- Standards: https://github.com/paurodriguez0220/standards-docs
 ```
 
 ### Rules
 
 - Write the README for someone joining the project cold — they should be able to run it locally in under 10 minutes.
 - Commands must be copy-pasteable and current. A README with broken setup steps is worse than none.
+- Architecture must explicitly name design patterns — "Orchestrator pattern", "Strategy + Factory", not just "there are services".
+- Dependencies section must list every runtime external service or significant NuGet package. If a dependency requires setup (API keys, accounts), link to or summarize the setup steps.
 - No corporate fluff. No "this project leverages cutting-edge technology to deliver business value."
 - Update the README when the setup changes. It's part of the work, not an afterthought.
 
@@ -142,5 +155,5 @@ Update the date when the document changes. The signature is a signal that the do
 - [Git Workflow](git-workflow.md)
 
 ---
-*Maintained by paurodriguez0220 · Last updated: 2026-06-15*
-*Standards: https://github.com/paurodriguez0220/standards*
+*Maintained by paurodriguez0220 · Last updated: 2026-06-18*
+*Standards: https://github.com/paurodriguez0220/standards-docs*
