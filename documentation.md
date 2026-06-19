@@ -75,8 +75,10 @@ docs/
 ├── decisions/              ← ADRs (see below)
 │   ├── 001-use-ef-core.md
 │   └── 002-jwt-auth.md
-├── issues/             ← permanent bugs / vendor limitations (see below)
-│   └── pdf-missing-letter.md
+├── issues/                 ← bugs / vendor limitations (see below)
+│   ├── queue/              ← newly discovered, root cause not yet confirmed
+│   ├── defined/            ← root cause known; won't fix or fix planned
+│   └── finished/           ← resolved, kept for reference
 ├── runbooks/               ← operational procedures
 │   └── rotate-secrets.md
 └── tasks/                  ← lightweight task tracking (see below)
@@ -91,37 +93,76 @@ Don't create `docs/` just to have it. One well-written README is better than a d
 
 ## Issues
 
-Create a `docs/issues/` folder to document bugs or limitations that are permanent — cannot be fixed in this codebase because the root cause is upstream (a library, a vendor API, an OS behaviour).
+Create a `docs/issues/` folder to document bugs or limitations — anything reproducible that has been investigated or is worth tracking. Issues follow the same three-stage lifecycle as tasks.
 
-One file per issue. Name the file after the symptom, not the cause: `pdf-missing-letter.md`, not `pdfpig-nel-bug.md`.
+```
+docs/issues/
+├── queue/      ← newly discovered; symptom described, root cause not yet confirmed
+├── defined/    ← root cause known; decision made (won't fix, workaround, or fix planned)
+└── finished/   ← resolved; kept as a record
+```
 
-### Template
+One file per issue. Advance the file through the lifecycle: `queue/` → `defined/` → `finished/`. Never delete — move.
+
+Name the file after the symptom, not the cause: `pdf-missing-letter.md`, not `pdfpig-nel-bug.md`.
+
+### Lifecycle
+
+| Folder | Meaning |
+| --- | --- |
+| `queue/` | Newly discovered. What happens is documented. Root cause is not yet confirmed. |
+| `defined/` | Root cause identified. A decision has been made: won't fix, workaround documented, or a fix is planned. |
+| `finished/` | Resolved. Moved here to preserve the investigation record. |
+
+### Template — Queue (open issue)
 
 ```markdown
-# <Short title: what the user sees>
+# Issue: <Short title — what the user sees>
 
-**Affected component:** `ClassName` — `method`
-**Status:** Will not fix (<reason>)
+**Status:** Open
 
-## What you see
-<Concrete example with before/after or input/output table.>
+## What Happens
+<Concrete description. Include an example, table, or before/after if it helps.>
 
-## Why it happens
-<Technical explanation.>
+## Context
+<What was already investigated. Possible causes.>
 
-## Why it cannot be fixed here
-<Why this is out of scope for this codebase.>
+## Acceptance Criteria
+- [ ] Root cause confirmed
+- [ ] Decision made (fix, workaround, or won't fix)
+```
 
-## Possible workaround (not implemented)
-<Optional. What would need to change to fix it upstream or in a future rewrite.>
+### Template — Defined (root cause known)
+
+```markdown
+# Issue: <Short title>
+
+**Status:** Will not fix (<reason>) | Fix planned | Workaround in place
+
+## What Happens
+<Concrete description.>
+
+## Context
+<Root cause explanation. Technical detail as needed.>
+
+## Possible Workaround (not implemented)
+<Optional. What would be needed to fix it upstream or in a future rewrite.>
+
+## Acceptance Criteria
+- [x] Root cause identified and documented
+- [ ] <Any remaining actions>
+
+---
+*Added: YYYY-MM-DD*
 ```
 
 ### When to write one
 
-- A bug exists, is reproducible, and has been investigated — but the fix requires replacing a core dependency or is impractical for now.
-- A behaviour looks wrong but is correct given a library constraint — future maintainers will waste time investigating it again.
+- A bug is reproducible but the fix is upstream, impractical, or deferred.
+- A behaviour looks wrong but is a library constraint — future maintainers will waste time investigating it again.
+- Any newly discovered problem worth tracking before root cause is known.
 
-Do not write issues for: things that should be fixed but haven't been yet (use `tasks/queue/`), or temporary workarounds you expect to remove soon.
+Do not write issues for tasks that are fully planned — use `docs/tasks/` instead.
 
 ---
 
@@ -275,5 +316,5 @@ Update the date when the document changes. The signature is a signal that the do
 - [Git Workflow](git-workflow.md)
 
 ---
-*Maintained by paurodriguez0220 · Last updated: 2026-06-19 · Added `defined/` task lifecycle stage*
+*Maintained by paurodriguez0220 · Last updated: 2026-06-19 · Issues folder now follows same queue/defined/finished lifecycle as tasks*
 *Standards: https://github.com/paurodriguez0220/standards-docs*
