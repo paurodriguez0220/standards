@@ -313,6 +313,46 @@ function getOrder(id: string): Promise<Order> { ... }
 const getOrder = async (id: any) => { ... }
 ```
 
+### Environment Variable Validation
+
+Validate required environment variables at module load time — not at the call site where they're used.
+
+```ts
+// Bad — undefined is silently cast to string; the error surfaces later with a cryptic message
+export const db = createClient({ url: import.meta.env.VITE_TURSO_URL as string });
+
+// Good — fails immediately with a clear, actionable message
+const url = import.meta.env.VITE_TURSO_URL as string | undefined;
+if (!url) throw new Error('Missing VITE_TURSO_URL — copy .env.example to .env.local');
+export const db = createClient({ url });
+```
+
+- Always commit a `.env.example` documenting every required variable (values left blank).
+- Always add `.env.local` / `.env` to `.gitignore`.
+
+### Money and Decimal Arithmetic
+
+Floating-point math is not suitable for currency. `0.1 + 0.2 === 0.30000000000000004` in JavaScript.
+
+- Never accumulate floating-point values across multiple operations — rounding errors compound.
+- When splitting a total across N recipients, assign the remainder to one recipient explicitly so the parts always sum to the original total.
+
+```ts
+// Bad — drops remainder: 10 / 3 = $3.33 × 3 = $9.99 ($0.01 lost permanently)
+const share = parseFloat((total / n).toFixed(2));
+const splits = members.map((m) => ({ memberId: m.id, share }));
+
+// Good — first member absorbs the floating-point remainder
+const base = parseFloat((total / n).toFixed(2));
+const remainder = parseFloat((total - base * n).toFixed(2));
+const splits = members.map((m, i) => ({
+  memberId: m.id,
+  share: i === 0 ? parseFloat((base + remainder).toFixed(2)) : base,
+}));
+```
+
+- For financial applications, use a library that keeps amounts as integers throughout (e.g. `dinero.js`).
+
 ### Async / Await
 
 - Always `async/await` over raw `.then()/.catch()` chains.

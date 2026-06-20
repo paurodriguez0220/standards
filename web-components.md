@@ -188,6 +188,47 @@ Never query by class name, tag name, or CSS selector.
 
 ---
 
+## Async Event Handlers
+
+Every async event handler needs a `catch` block. A `try/finally` without `catch` silently swallows the error — the spinner stops, nothing happens, the user has no idea what went wrong.
+
+```tsx
+// Bad — error propagates as unhandled rejection, user sees spinner disappear
+async function handleSubmit(e: React.FormEvent): Promise<void> {
+  e.preventDefault();
+  setIsSaving(true);
+  try {
+    await save(data);
+  } finally {
+    setIsSaving(false);
+  }
+}
+
+// Good — error surfaced to the user
+const [submitError, setSubmitError] = useState<string | undefined>();
+
+async function handleSubmit(e: React.FormEvent): Promise<void> {
+  e.preventDefault();
+  setIsSaving(true);
+  setSubmitError(undefined);
+  try {
+    await save(data);
+  } catch (err) {
+    setSubmitError(err instanceof Error ? err.message : 'Something went wrong');
+  } finally {
+    setIsSaving(false);
+  }
+}
+```
+
+Rules:
+- Every async handler needs `catch` or a mechanism that surfaces the error in the UI.
+- Keep a local error state next to every form or action that has an async handler.
+- Clear the error at the start of each new attempt (`setSubmitError(undefined)`).
+- Partial failures (e.g. first DB write succeeds, second fails) must be treated as errors — show the message, do not silently retry.
+
+---
+
 ## Mobile / Touch Considerations
 
 When building for mobile PWA (iPhone 15+, 390×844 logical px):
